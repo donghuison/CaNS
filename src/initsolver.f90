@@ -1,6 +1,6 @@
 ! -
 !
-! SPDX-FileCopyrightText: Copyright (c) 2017-2022 Pedro Costa and the CaNS contributors. All rights reserved.
+! SPDX-FileCopyrightText: Pedro Costa and the CaNS contributors
 ! SPDX-License-Identifier: MIT
 !
 ! -
@@ -26,15 +26,15 @@ module mod_initsolver
     real(rp), intent(out), dimension(lo_z(1):,lo_z(2):) :: lambdaxy
     character(len=1), intent(in), dimension(3) :: c_or_f
     real(rp), intent(out), dimension(lo_z(3):) :: a,b,c
-#if !defined(_OPENACC)
+#if !defined(_OPENACC) || defined(_USE_HIP)
     type(C_PTR), intent(out), dimension(2,2) :: arrplan
 #else
     integer    , intent(out), dimension(2,2) :: arrplan
 #endif
+    real(rp), intent(out) :: normfft
     real(rp), intent(out), dimension(:,:,0:) :: rhsbx
     real(rp), intent(out), dimension(:,:,0:) :: rhsby
     real(rp), intent(out), dimension(:,:,0:) :: rhsbz
-    real(rp), intent(out) :: normfft
     real(rp), dimension(3)        :: dl
     real(rp), dimension(0:ng(3)+1) :: dzc_g,dzf_g
     integer :: i,j
@@ -191,8 +191,8 @@ module mod_initsolver
     character(len=1), intent(in), dimension(0:1) :: cbc
     real(rp), intent(in), dimension(0:1) :: bc
     real(rp), intent(in), dimension(0:1) :: dlc,dlf
-    real(rp), intent(out), dimension(:,:,0:) :: rhs
     character(len=1), intent(in) :: c_or_f ! c -> cell-centered; f -> face-centered
+    real(rp), intent(out), dimension(:,:,0:) :: rhs
     real(rp), dimension(0:1) :: factor
     real(rp) :: sgn
     integer :: ibound

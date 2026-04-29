@@ -2,8 +2,18 @@ override LIBS += -L$(LIBS_DIR)/2decomp-fft -ldecomp2d
 override INCS += -I$(LIBS_DIR)/2decomp-fft/mod
 
 ifeq ($(strip $(GPU)),1)
-override LIBS += -L$(LIBS_DIR)/cuDecomp/build/lib -lcudecomp -lcudecomp_fort -cudalib=cufft
+ifneq ($(strip $(USE_DIEZDECOMP)),1)
+override LIBS += -L$(LIBS_DIR)/cuDecomp/build/lib -lcudecomp -lcudecomp_fort
 override INCS += -I$(LIBS_DIR)/cuDecomp/build/include
+else
+override LIBS += -L$(LIBS_DIR)/diezDecomp/build/lib -ldiezdecomp
+override INCS += -I$(LIBS_DIR)/diezDecomp/build/include
+endif
+ifneq ($(strip $(USE_HIP)),1)
+override LIBS += -cudalib=cufft
+else
+override LIBS += -lhipfft
+endif
 endif
 
 ifeq ($(strip $(USE_NVTX)),1)
@@ -25,4 +35,14 @@ override LIBS += -lfftw3f_threads
 endif
 endif
 
+endif
+
+ifeq ($(strip $(USE_ADIOS2)),1)
+override LIBS += -ladios2_mpi_fortran -ladios2_mpi_fortran_mpi
+override INCS += -I/usr/include/adios2/fortran
+endif
+
+ifeq ($(strip $(USE_HDF5)),1)
+override LIBS += -lhdf5_openmpi_fortran
+override INCS += -I/usr/include/hdf5/openmpi
 endif
